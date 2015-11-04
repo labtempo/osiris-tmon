@@ -109,11 +109,8 @@ public class App {
                 properties.setProperty("rabbitmq.server.ip", "192.168.0.7");
                 properties.setProperty("rabbitmq.user.name", "admin");
                 properties.setProperty("rabbitmq.user.pass", "admin");
-                properties.setProperty("postgres.server.ip", "192.168.0.7");
-                properties.setProperty("postgres.server.port", "5432");
-                properties.setProperty("postgres.user.name", "postgres");
-                properties.setProperty("postgres.user.pass", "postgres");
-                properties.setProperty("postgres.server.db", "TMON");
+                properties.setProperty("tmon.collector.name", "base");
+                properties.setProperty("tmon.capture.interval.minutes", "6");
 
                 FileOutputStream fileOut = new FileOutputStream(configFile);
 

@@ -23,6 +23,10 @@ import br.uff.labtempo.osiris.omcp.EventController;
 import br.uff.labtempo.tmon.tmonmanager.controller.MainController;
 import br.uff.labtempo.tmon.tmonmanager.controller.util.VsnManager;
 import br.uff.labtempo.tmon.tmonmanager.controller.util.VsnManagerImpl;
+import br.uff.labtempo.tmon.tmonmanager.factory.ConnectionFactory;
+import br.uff.labtempo.tmon.tmonmanager.persistence.PostgresStorage;
+import br.uff.labtempo.tmon.tmonmanager.persistence.Storage;
+import java.sql.Connection;
 import java.util.Properties;
 
 /**
@@ -44,6 +48,7 @@ public class Bootstrap implements AutoCloseable {
         String user = properties.getProperty("rabbitmq.user.name");
         String pass = properties.getProperty("rabbitmq.user.pass");
 
+        Connection connection = getConnection(properties);
         //TMON MANAGER
         String moduleName = Config.MODULE_NAME;
 
@@ -52,7 +57,8 @@ public class Bootstrap implements AutoCloseable {
             omcpClient = new OmcpClientBuilder().host(ip).user(user, pass).source(moduleName).build();
 
             VsnManager manager = new VsnManagerImpl(omcpClient);
-            EventController mainController = new MainController(manager, AVERAGE_INTERVAL_IN_MILLIS);
+            Storage storage = new PostgresStorage(connection);
+            EventController mainController = new MainController(manager, storage, AVERAGE_INTERVAL_IN_MILLIS);
 
             omcpService = new RabbitService(ip, user, pass, silent);
             omcpService.addReference("omcp://update.messagegroup/#");
@@ -85,4 +91,16 @@ public class Bootstrap implements AutoCloseable {
         }
     }
 
+    private Connection getConnection(Properties properties) {
+
+        String ip = properties.getProperty("postgres.server.ip");
+        String port = properties.getProperty("postgres.server.port");
+        String user = properties.getProperty("postgres.user.name");
+        String pass = properties.getProperty("postgres.user.pass");
+        String db = properties.getProperty("postgres.server.db");
+
+        Connection connection = new ConnectionFactory(ip, port, user, pass, db).getConnection();
+
+        return connection;
+    }
 }

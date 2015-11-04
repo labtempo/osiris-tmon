@@ -15,7 +15,13 @@
  */
 package br.uff.labtempo.tmon.tmoncollector;
 
-
+import br.uff.labtempo.omcp.client.OmcpClient;
+import br.uff.labtempo.omcp.client.OmcpClientBuilder;
+import br.uff.labtempo.osiris.to.collector.SensorCoTo;
+import br.uff.labtempo.tmon.tmoncollector.controller.MainController;
+import br.uff.labtempo.tmon.tmoncollector.driver.tinyos.TinyOsDriver;
+import br.uff.labtempo.tmon.tmoncollector.driver.DataListener;
+import br.uff.labtempo.tmon.tmoncollector.driver.Driver;
 import java.util.Properties;
 
 /**
@@ -23,6 +29,9 @@ import java.util.Properties;
  * @author Felipe Santos <fralph at ic.uff.br>
  */
 public class Bootstrap implements AutoCloseable {
+
+    private OmcpClient client;
+    private Driver driver;
 
     public Bootstrap(Properties properties) throws Exception {
         this(properties, false);
@@ -32,22 +41,24 @@ public class Bootstrap implements AutoCloseable {
         String ip = properties.getProperty("rabbitmq.server.ip");
         String user = properties.getProperty("rabbitmq.user.name");
         String pass = properties.getProperty("rabbitmq.user.pass");
-
-        //TMON MANAGER
-       
+        String collectorName = properties.getProperty("tmon.collector.name");
+        int captureInterval = Integer.parseInt(properties.getProperty("tmon.capture.interval.minutes"));
+        //TMON Collector
 
         try {
-
-            
+            driver = new TinyOsDriver();
+            client = new OmcpClientBuilder().host(ip).user(user, pass).source(collectorName).build();
+            DataListener<SensorCoTo> listener = new MainController(null, collectorName, collectorName, captureInterval);
+            driver.setOnDataCaptureListener(listener);
         } catch (Exception ex) {
             close();
             throw ex;
         }
     }
 
-    public void start() {
+    public void start() throws Exception {
         try {
-            
+            driver.start();
         } catch (Exception ex) {
             close();
             throw ex;
@@ -57,12 +68,12 @@ public class Bootstrap implements AutoCloseable {
     @Override
     public void close() {
         try {
-           
+            driver.close();
         } catch (Exception e) {
         }
 
         try {
-            
+            client.close();
         } catch (Exception e) {
         }
     }

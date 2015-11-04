@@ -27,6 +27,7 @@ import br.uff.labtempo.osiris.to.virtualsensornet.ValueVsnTo;
 import br.uff.labtempo.osiris.to.virtualsensornet.VirtualSensorType;
 import br.uff.labtempo.osiris.to.virtualsensornet.VirtualSensorVsnTo;
 import br.uff.labtempo.tmon.tmonmanager.controller.util.VsnManager;
+import br.uff.labtempo.tmon.tmonmanager.utils.DummyStorage;
 import br.uff.labtempo.tmon.tmonmanager.utils.DummyVsnManager;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
@@ -48,13 +49,13 @@ public class MainControllerTest {
     @Test
     public void testNewSensor_ShouldPass() {
         VsnManager vsnManager = new DummyVsnManager();
-        MainController mc = new MainController(vsnManager, 10);
+        MainController mc = new MainController(vsnManager, new DummyStorage(), 10);
         mc.checkSensor(sensor);
         assertEquals(sensor.getValuesTo().size(), vsnManager.omcpGetDataTypes().length);
         assertEquals(1, vsnManager.omcpGetLinks().length);
 
         LinkVsnTo link = vsnManager.omcpGetLinks()[0];
-        assertEquals("sensor", link.getSensorId());
+        assertEquals("1", link.getSensorId());
         assertEquals("collector", link.getCollectorId());
         assertEquals("network", link.getNetworkId());
     }
@@ -62,7 +63,7 @@ public class MainControllerTest {
     @Test
     public void testNewVirtualSensor_ShouldPass() {
         VsnManager vsnManager = new DummyVsnManager();
-        MainController mc = new MainController(vsnManager, 10);
+        MainController mc = new MainController(vsnManager, new DummyStorage(), 10);
         mc.checkSensor(sensor);
         LinkVsnTo link = vsnManager.omcpGetLinks()[0];
         VirtualSensorVsnTo vsensor = convertLinkToVirtualSensor(link, vsnManager.omcpGetDataTypes());
@@ -84,7 +85,7 @@ public class MainControllerTest {
     @Test
     public void testInactiveVirtualSensor_ShouldPass() {
         VsnManager vsnManager = new DummyVsnManager();
-        MainController mc = new MainController(vsnManager, 10);
+        MainController mc = new MainController(vsnManager, new DummyStorage(), 10);
         mc.checkSensor(sensor);
         LinkVsnTo link = vsnManager.omcpGetLinks()[0];
         VirtualSensorVsnTo vsensor = convertLinkToVirtualSensor(link, vsnManager.omcpGetDataTypes());
@@ -104,7 +105,7 @@ public class MainControllerTest {
 
         vsensor = disableVirtualSensor(vsensor);
         mc.checkVirtualSensor(vsensor);
-        
+
         blending = vsnManager.omcpGetBlendings()[0];
         assertEquals(0, blending.getRequestParams().size());
 
@@ -115,7 +116,7 @@ public class MainControllerTest {
     }
 
     private SensorSnTo generateSensor() {
-        String id = "sensor";
+        String id = "1";
         State state = State.NEW;
         long captureTimestampInMillis = 10;
         int capturePrecisionInNano = 20;

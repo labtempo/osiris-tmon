@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.uff.labtempo.tmon.tmonmanager;
+package br.uff.labtempo.tmon.tmoncollector;
 
 /**
  *
@@ -21,11 +21,7 @@ package br.uff.labtempo.tmon.tmonmanager;
  */
 public class Config {
 
-    public static final String MODULE_NAME = "TMON_MANAGER";
-    public static final String AVERAGE_FUNCTION_MODULE_ADDRESS = "omcp://average.function.osiris/";
-    public static final String BLENDING_FIELD_NAME = "temperature";
-    public static final String FUNCTION_REQUEST_PARAM = "temperatures";
-    public static final String FUNCTION_RESPONSE_PARAM = "average";
+    public static final String NETWORK_NAME = "tmon";
     public static final String SENSOR_VALUE_TEMPERATURE = "temperature";
     public static final String SENSOR_VALUE_VOLTAGE = "voltage";
     public static final String SENSOR_VALUE_LIGHT = "light";
@@ -33,5 +29,6 @@ public class Config {
     public static final String SENSOR_INFO_PARENT = "parent";
     public static final String SENSOR_INFO_METRIC = "metric";
     public static final String SENSOR_INFO_MOTE_MODEL = "moteModel";
+    public static final String COLLECTOR_MESSAGEGROUP = "omcp://collector.messagegroup/";
 
 }
