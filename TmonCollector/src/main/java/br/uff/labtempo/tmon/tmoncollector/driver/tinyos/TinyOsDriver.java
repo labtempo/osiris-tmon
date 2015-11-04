@@ -39,6 +39,7 @@ public class TinyOsDriver implements Driver<SensorCoTo>, Printer {
 
     private DataListener<SensorCoTo> listener;
     private Command command;
+    //python HybridWSNCollector.py serial@/dev/ttyUSB1:57600 0xee iris
     private final String FILE = "HybridWSNCollector.py";
     private final String COMMAND_ENTRY = "python " + FILE;
 
@@ -90,6 +91,22 @@ public class TinyOsDriver implements Driver<SensorCoTo>, Printer {
     }
 
     private SensorCoTo parseData(String data) throws Exception {
+        /*
+         * Flushing the serial port..
+            45678:0:25.132156:31:3.177922:0:10
+            45678:1:25.229326:64:3.177922:0:10
+            45678:2:25.229326:71:3.177922:0:10
+            45678:3:25.229326:69:3.177922:0:10
+            45678:4:25.326550:79:3.177922:0:10
+            45678:5:25.326550:71:3.177922:0:10
+            45678:6:25.326550:68:3.177922:0:10
+            45678:7:25.423830:67:3.177922:0:10
+            45678:8:25.423830:71:3.177922:0:10
+            45678:9:25.521165:70:3.177922:0:10
+            45678:10:25.618557:71:3.177922:0:10
+            45678:11:25.618557:76:3.177922:0:10
+            45678:12:25.716006:75:3.177922:0:10
+         */
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -147,15 +147,15 @@ class CTPDebugMsg(TosPacketWrapper):
         if self.type != CTPDebugMsg.NET_C_FE_RCV_MSG:            
             desc = CTPDebugMsg.MSG_DESC.get(self.type, None)
                         
-            if self.type not in CTPDebugMsg.MSG_BLACK_LIST:
-                logger.warning("CTP DebugMsg %03d: type = 0x%x, data = %s: %s" % (self.seqno, self.type, self.data, desc))
-            else:                            
-                if desc is None:
+            #if self.type not in CTPDebugMsg.MSG_BLACK_LIST:
+                #logger.warning("CTP DebugMsg %03d: type = 0x%x, data = %s: %s" % (self.seqno, self.type, self.data, desc))
+            #else:                            
+                #if desc is None:
                     # general handling (no desc)
-                    logger.info("CTP DebugMsg %03d: type = 0x%x, data = %s" % (self.seqno, self.type, self.data))
-                else:
+                    #logger.info("CTP DebugMsg %03d: type = 0x%x, data = %s" % (self.seqno, self.type, self.data))
+                #else:
                     # general handling (with desc)                 
-                    logger.info("CTP DebugMsg %03d: type = 0x%x, data = %s: %s" % (self.seqno, self.type, self.data, desc))
+                    #logger.info("CTP DebugMsg %03d: type = 0x%x, data = %s: %s" % (self.seqno, self.type, self.data, desc))
 
 
 def create_logger(filename):
@@ -174,8 +174,8 @@ def create_logger(filename):
     formatter = logging.Formatter(fmt="%(asctime)s: %(name)-18s: %(levelname)-8s: %(message)s")
     fh.setFormatter(formatter)   
     
-    logger.addHandler(ch)
-    logger.addHandler(fh)
+    #logger.addHandler(ch)
+    #logger.addHandler(fh)
     
     return logger
 
@@ -199,7 +199,7 @@ def save_reading(timestamp, msg, file):
         msg.readingLight = 0
     else:
         readingTemperature = raw_to_celcius(msg.readingTemperature)
-    logger.info("Mote %d:    Temperature: %f    Light: %d    Voltage: %f    Parent: %d    Metric: %d    Delay: %d" % (msg.source, readingTemperature, msg.readingLight, voltage, msg.parent, msg.metric, msg.delay))
+    #logger.info("Mote %d:    Temperature: %f    Light: %d    Voltage: %f    Parent: %d    Metric: %d    Delay: %d" % (msg.source, readingTemperature, msg.readingLight, voltage, msg.parent, msg.metric, msg.delay))
     file.write("%f %d %d %f %d %f\n" % (timestamp-delay, msg.source, msg.seqno, readingTemperature, msg.readingLight, voltage))
     file.flush()
             
@@ -215,15 +215,18 @@ def publish_reading(msg):
     else:
         readingTemperature = raw_to_celcius(msg.readingTemperature)
     try:
-        event = '%d %d %f %d %f %d %d' % (msg.source, msg.seqno, readingTemperature, msg.readingLight, voltage, msg.parent, msg.metric)
-        publish(ALERT_INFO, (datetime.datetime.now() - datetime.timedelta(milliseconds=msg.delay)), event, EXCHANGE_READINGS)
+	# mote, sendCount, readingTemperature, readingLight, readingVoltage, parent, metric        
+	event = '%d:%d:%f:%d:%f:%d:%d' % (msg.source, msg.seqno, readingTemperature, msg.readingLight, voltage, msg.parent, msg.metric)
+        ##publish(ALERT_INFO, (datetime.datetime.now() - datetime.timedelta(milliseconds=msg.delay)), event, EXCHANGE_READINGS)
+	time = (datetime.datetime.now() - datetime.timedelta(milliseconds=msg.delay))
+	print event
     except TypeError, e:
         print e        
     
     
 def print_ctp_header_info(ctp_packet_header):
     global logger
-    logger.info("CTP header informations:: Options: %d    THL: %d    ETX: %d    Origin: %d    OriginSeqNo: %d    CollectionId: %d" % (ctp_packet_header.options, ctp_packet_header.thl, ctp_packet_header.etx, ctp_packet_header.origin, ctp_packet_header.originSeqNo, ctp_packet_header.collectionId))
+    #logger.info("CTP header informations:: Options: %d    THL: %d    ETX: %d    Origin: %d    OriginSeqNo: %d    CollectionId: %d" % (ctp_packet_header.options, ctp_packet_header.thl, ctp_packet_header.etx, ctp_packet_header.origin, ctp_packet_header.originSeqNo, ctp_packet_header.collectionId))
 
 def new_multihopsensing_packet(data, mote_type):
     msg = None                                   
@@ -268,7 +271,7 @@ def main(args):
     
     try:
         am = tos.AM()
-        logger.warning("Starting...")
+        #logger.warning("Starting...")
         
         while True:
             p = am.read()  # get a packet
@@ -286,17 +289,17 @@ def main(args):
                     last_len = len(motes)
                     motes.add(samples.source)
                     curr_len = len(motes)
-                    if last_len < curr_len:
-                        logger.warning("Mote %d entered the network!" % samples.source)
+                    #if last_len < curr_len:
+                        #logger.warning("Mote %d entered the network!" % samples.source)
             else:
                 if p and p.type == CTPDebugMsg.AM_ID:                    
                     msg = CTPDebugMsg(p.data)
                     msg.process()
-                else:
-                    logger.warning("Skipping packet %s" % p)
-    except KeyboardInterrupt:
+                #else:
+                    ##logger.warning("Skipping packet %s" % p)
+    #except KeyboardInterrupt:
         # print_database() #to test persistence in to database
-        logger.warning("Aborting...")
+        #logger.warning("Aborting...")
     except SystemExit:
         pass  # nothing to say about system exit
     except:
