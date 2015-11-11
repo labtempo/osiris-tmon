@@ -41,10 +41,11 @@ public class TmonDataParser {
         //mote, time, sendCount, readingTemperature, readingLight, readingVoltage, parent, metric, moteModel
         int index = 0;
         try {
-            String[] data = line.split(":");
+            String[] data = line.split("|");
 
             String mote = data[0];
             index++;
+		//String
             long time = Long.parseLong(data[1]);
             index++;
             String sendCount = data[2];

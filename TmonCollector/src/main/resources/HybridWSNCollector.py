@@ -215,9 +215,10 @@ def publish_reading(msg):
     else:
         readingTemperature = raw_to_celcius(msg.readingTemperature)
     try:
+	# 45678|2015-11-11 15:47:37.136511|1|25.229326|237|3.338598|0|10|iris	
 	# mote, time, sendCount, readingTemperature, readingLight, readingVoltage, parent, metric, moteModel
         time = (datetime.datetime.now() - datetime.timedelta(milliseconds=msg.delay))       
-	event = '%d:%d:%d:%f:%d:%f:%d:%d:%s' % (msg.source, time, msg.seqno, readingTemperature, msg.readingLight, voltage, msg.parent, msg.metric, mote_type)
+	event = '%d|%s|%d|%f|%d|%f|%d|%d|%s' % (msg.source, time, msg.seqno, readingTemperature, msg.readingLight, voltage, msg.parent, msg.metric, mote_type)
         ##publish(ALERT_INFO, (datetime.datetime.now() - datetime.timedelta(milliseconds=msg.delay)), event, EXCHANGE_READINGS)
 	
 	print event
