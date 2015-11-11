@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,8 +43,12 @@ public class TinyOsDriver implements Driver<SensorCoTo>, Printer {
     //python HybridWSNCollector.py serial@/dev/ttyUSB1:57600 0xee iris
     private final String FILE = "HybridWSNCollector.py";
     private final String COMMAND_ENTRY = "python " + FILE;
+    private TmonDataParser parser;
 
     public TinyOsDriver() throws Exception {
+        this.parser = new TmonDataParser();
+        parser.exclude("Flushing the serial port..");
+
         String path = GetExecutionPath();
         File f = new File(path + "/" + FILE);
         if (!f.exists()) {
@@ -78,8 +83,9 @@ public class TinyOsDriver implements Driver<SensorCoTo>, Printer {
             String line;
             while ((line = reader.readLine()) != null) {
                 SensorCoTo sensor = parseData(line);
-                listener.onDataCapture(sensor);
-
+                if (sensor != null) {
+                    listener.onDataCapture(sensor);
+                }
             }
         } catch (Exception ex) {
             Logger.getLogger(TinyOsDriver.class.getName()).log(Level.SEVERE, null, ex);
@@ -91,23 +97,30 @@ public class TinyOsDriver implements Driver<SensorCoTo>, Printer {
     }
 
     private SensorCoTo parseData(String data) throws Exception {
-        /*
-         * Flushing the serial port..
-            45678:0:25.132156:31:3.177922:0:10
-            45678:1:25.229326:64:3.177922:0:10
-            45678:2:25.229326:71:3.177922:0:10
-            45678:3:25.229326:69:3.177922:0:10
-            45678:4:25.326550:79:3.177922:0:10
-            45678:5:25.326550:71:3.177922:0:10
-            45678:6:25.326550:68:3.177922:0:10
-            45678:7:25.423830:67:3.177922:0:10
-            45678:8:25.423830:71:3.177922:0:10
-            45678:9:25.521165:70:3.177922:0:10
-            45678:10:25.618557:71:3.177922:0:10
-            45678:11:25.618557:76:3.177922:0:10
-            45678:12:25.716006:75:3.177922:0:10
-         */
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            /*
+             *
+             Flushing the serial port..
+             45678:0:25.132156:31:3.177922:0:10
+             45678:1:25.229326:64:3.177922:0:10
+             45678:2:25.229326:71:3.177922:0:10
+             45678:3:25.229326:69:3.177922:0:10
+             45678:4:25.326550:79:3.177922:0:10
+             45678:5:25.326550:71:3.177922:0:10
+             45678:6:25.326550:68:3.177922:0:10
+             45678:7:25.423830:67:3.177922:0:10
+             45678:8:25.423830:71:3.177922:0:10
+             45678:9:25.521165:70:3.177922:0:10
+             45678:10:25.618557:71:3.177922:0:10
+             45678:11:25.618557:76:3.177922:0:10
+             45678:12:25.716006:75:3.177922:0:10
+             */
+            SensorCoTo sensor = parser.parse(data);
+            return sensor;
+        } catch (ParseException ex) {
+            Logger.getLogger(TinyOsDriver.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        }
     }
 
     private void copyFileFromResourceToJarFolder(String resource, File destination) throws FileNotFoundException, IOException {
