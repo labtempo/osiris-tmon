@@ -18,7 +18,6 @@ package br.uff.labtempo.tmon.tmoncollector.driver.tinyos;
 import br.uff.labtempo.osiris.to.collector.SensorCoTo;
 import br.uff.labtempo.tmon.tmoncollector.Config;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,11 +41,12 @@ public class TmonDataParser {
         //mote, time, sendCount, readingTemperature, readingLight, readingVoltage, parent, metric, moteModel
         int index = 0;
         try {
-            String[] data = line.split("\\|");
+            String[] data = line.split(":");
 
             String mote = data[0];
             index++;
-            long time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS").parse(data[1]).getTime();
+		//String
+            long time = Long.parseLong(data[1]);
             index++;
             String sendCount = data[2];
             index++;
@@ -61,7 +61,7 @@ public class TmonDataParser {
             String metric = data[7];
             index++;
             String moteModel = data[8];
-          
+
             SensorCoTo sensor = new SensorCoTo(mote, time);
             sensor.addValue(Config.SENSOR_VALUE_TEMPERATURE, readingTemperature, "celsius", "C°");
             sensor.addValue(Config.SENSOR_VALUE_LIGHT, readingLight, "candela", "C");
