@@ -67,8 +67,8 @@ public class MainController extends Controller {
                     }
                     
                     ParameterizedRequestFn prf = new ParameterizedRequestFn(urlParams);
-                    RequestFnTo to = prf.getRequestFnTo();
-                    ResponseFnTo responseFnTo = execute(to, request.getDate());
+                    RequestFnTo requestFnTo = prf.getRequestFnTo();
+                    ResponseFnTo responseFnTo = execute(requestFnTo, request.getDate());
                     Response response = new ResponseBuilder().ok(responseFnTo, contentType).build();
                     return response;
                 case POST:

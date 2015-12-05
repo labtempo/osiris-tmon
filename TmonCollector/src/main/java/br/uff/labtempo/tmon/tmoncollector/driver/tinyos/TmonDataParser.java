@@ -16,10 +16,17 @@
 package br.uff.labtempo.tmon.tmoncollector.driver.tinyos;
 
 import br.uff.labtempo.osiris.to.collector.SensorCoTo;
+import br.uff.labtempo.osiris.to.common.definitions.LogicalOperator;
 import br.uff.labtempo.tmon.tmoncollector.Config;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -41,12 +48,12 @@ public class TmonDataParser {
         //mote, time, sendCount, readingTemperature, readingLight, readingVoltage, parent, metric, moteModel
         int index = 0;
         try {
-            String[] data = line.split("|");
+            String[] data = line.split("\\|");
 
             String mote = data[0];
             index++;
-		//String
-            long time = Long.parseLong(data[1]);
+            //String
+            long time = getTimeStampFromString(data[1]);
             index++;
             String sendCount = data[2];
             index++;
@@ -71,6 +78,19 @@ public class TmonDataParser {
             sensor.addInfo(Config.SENSOR_INFO_PARENT, parent);
             sensor.addInfo(Config.SENSOR_INFO_METRIC, metric);
             sensor.addInfo(Config.SENSOR_INFO_MOTE_MODEL, moteModel);
+            //consumables
+//            double minVoltage = 1.6;
+//            double maxVoltage = 3.0;
+//            double current = (readingVoltage - minVoltage);
+//            double max = (maxVoltage - minVoltage);
+//            int currentPercent = (int) (current * 100 / max);
+//
+//            if (currentPercent > 100) {
+//                currentPercent = 100;
+//            }
+//            sensor.addConsumable("battery", currentPercent);
+//            sensor.addConsumableRule("Bateria baixa", "battery", LogicalOperator.LESS_THAN, 80, "Bateria baixa!");
+
             return sensor;
         } catch (Exception ex) {
             for (String item : exclusion) {
@@ -78,7 +98,14 @@ public class TmonDataParser {
                     return null;
                 }
             }
-            throw new ParseException(line, index);
+            throw new ParseException(ex.getMessage(), index);
         }
+    }
+
+    private long getTimeStampFromString(String datetime) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = format.parse(datetime);
+        return date.getTime();
     }
 }

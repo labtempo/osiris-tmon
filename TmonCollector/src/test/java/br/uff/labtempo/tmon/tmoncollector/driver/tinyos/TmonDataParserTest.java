@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      http|//www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,37 +39,38 @@ public class TmonDataParserTest {
     @Test
     public void testSomeMethod() throws ParseException {
 
+        //45678|2015-11-11 15:47:37.136511|1|25.229326|237|3.338598|0|10|iris
         SensorCoTo sensor = parser.parse("Flushing the serial port..");
         assertNull(sensor);
-        sensor = parser.parse("45678:1446685563256:0:25.132156:31:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|0|25.132156|31|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:1:25.229326:64:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|1|25.229326|64|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:2:25.229326:71:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|2|25.229326|71|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:3:25.229326:69:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|3|25.229326|69|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:4:25.326550:79:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|4|25.326550|79|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:5:25.326550:71:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|5|25.326550|71|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:6:25.326550:68:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|6|25.326550|68|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:7:25.423830:67:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|7|25.423830|67|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:8:25.423830:71:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|8|25.423830|71|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:9:25.521165:70:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|9|25.521165|70|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:10:25.618557:71:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|10|25.618557|71|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:11:25.618557:76:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|11|25.618557|76|3.177922|0|10|iris");
         assertNotNull(sensor);
-        sensor = parser.parse("45678:1446685563256:12:25.716006:75:3.177922:0:10:iris");
+        sensor = parser.parse("45678|2015-11-11 15:47:37.136511|12|25.716006|75|3.177922|0|10|iris");
         assertNotNull(sensor);
 
-        assertEquals(sensor.getId(), "45678");
-        assertEquals(sensor.getCaptureTimestampInMillis(), 1446685563256L);
+        assertEquals("45678", sensor.getId());
+        assertEquals(1447256993511L, sensor.getCaptureTimestampInMillis());
 
         double temperature = 0;
         double voltage = 0;
@@ -90,8 +91,8 @@ public class TmonDataParserTest {
                     break;
             }
         }
-        
-         //info
+
+        //info
         int sendCount = 0;
         int parent = 0;
         int metric = 0;

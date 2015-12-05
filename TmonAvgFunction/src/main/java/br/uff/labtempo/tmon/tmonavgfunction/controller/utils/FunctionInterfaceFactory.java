@@ -30,7 +30,7 @@ public class FunctionInterfaceFactory {
 
     public static final String MODULE_NAME = "average.function";
     public static final String NAME = "avg";
-    public static final String DESRIPTION = "average function";
+    public static final String DESRIPTION = "modulo para calcular a media de temperatura";
     public static final String REQUEST_PARAM = "temperatures";
     public static final String RESPONSE_PARAM = "average";
     public static final String ADDRESS = "omcp://average.function.osiris/";

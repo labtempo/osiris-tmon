@@ -124,7 +124,7 @@ public class ToHandlerImpl implements ToHandler {
 
     @Override
     public BlendingVsnTo addFunctionToBlending(BlendingVsnTo blending, FunctionVsnTo function, long callInterval) {
-         blending.setFunction(function);
+        blending.setFunction(function);
         blending.setCallMode(FunctionOperation.SYNCHRONOUS);
         blending.setCallIntervalInMillis(callInterval);
         return blending;
