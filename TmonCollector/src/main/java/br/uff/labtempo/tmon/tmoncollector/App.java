@@ -37,17 +37,35 @@ public class App {
     private static Bootstrap boot;
 
     public static void main(String[] args) throws Exception {
-        boolean silent = false;
+        boolean help = false;
+        String params = null;
         for (String arg : args) {
-            if("silent".equalsIgnoreCase(arg)){
-                System.out.println("SILENT MODE!");
-                silent = true;
+            if ("-h".equalsIgnoreCase(arg)) {
+                //System.out.println("SILENT MODE!");
+                help = true;
                 break;
             }
         }
+
+        if (help || args.length < 3) {
+            System.out.println("If you are wondering where is the first parameter (e.g. serial@/dev/ttyUSB0:57600) parsed, it is inside tos (when you import it).");
+            System.out.println("Usage: serial@/dev/ttyUSB1:57600 {message_type (e.g. 0xee)} {mote_type (micaz/iris)} [ignore list]");
+            System.exit(0);
+
+        } else {
+            StringBuilder builder = new StringBuilder();
+            for (String s : args) {
+                if (builder.length() > 0) {
+                    builder.append(" ");
+                }
+                builder.append(s);
+            }
+            params = builder.toString();
+        }
+
         Properties properties = readConfig();
         shutdownHook();
-        boot = new Bootstrap(properties, silent);
+        boot = new Bootstrap(params, properties, false);
         boot.start();
     }
 

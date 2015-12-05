@@ -42,6 +42,7 @@ public class ConsoleCommand implements Command {
             process = Runtime.getRuntime().exec(command);
             InputStream is = process.getInputStream();
             printer.setInputStream(is);
+            printer.setErrorStream(process.getErrorStream());
             process.waitFor();
             process = null;
         }

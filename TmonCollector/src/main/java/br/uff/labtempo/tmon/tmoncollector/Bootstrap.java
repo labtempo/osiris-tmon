@@ -22,6 +22,7 @@ import br.uff.labtempo.tmon.tmoncollector.controller.MainController;
 import br.uff.labtempo.tmon.tmoncollector.driver.tinyos.TinyOsDriver;
 import br.uff.labtempo.tmon.tmoncollector.driver.DataListener;
 import br.uff.labtempo.tmon.tmoncollector.driver.Driver;
+import br.uff.labtempo.tmon.tmoncollector.driver.virtual.VirtualDriver;
 import java.util.Properties;
 
 /**
@@ -33,11 +34,11 @@ public class Bootstrap implements AutoCloseable {
     private OmcpClient client;
     private Driver driver;
 
-    public Bootstrap(Properties properties) throws Exception {
-        this(properties, false);
+    public Bootstrap(String params, Properties properties) throws Exception {
+        this(params, properties, false);
     }
 
-    public Bootstrap(Properties properties, boolean silent) throws Exception {
+    public Bootstrap(String params, Properties properties, boolean silent) throws Exception {
         String ip = properties.getProperty("rabbitmq.server.ip");
         String user = properties.getProperty("rabbitmq.user.name");
         String pass = properties.getProperty("rabbitmq.user.pass");
@@ -46,9 +47,9 @@ public class Bootstrap implements AutoCloseable {
         //TMON Collector
 
         try {
-            driver = new TinyOsDriver();
+            driver = new VirtualDriver();
             client = new OmcpClientBuilder().host(ip).user(user, pass).source(collectorName).build();
-            DataListener<SensorCoTo> listener = new MainController(null, collectorName, collectorName, captureInterval);
+            DataListener<SensorCoTo> listener = new MainController(client, collectorName, collectorName, captureInterval);
             driver.setOnDataCaptureListener(listener);
         } catch (Exception ex) {
             close();
@@ -68,12 +69,12 @@ public class Bootstrap implements AutoCloseable {
     @Override
     public void close() {
         try {
-            driver.close();
+            client.close();
         } catch (Exception e) {
         }
-
+        
         try {
-            client.close();
+            driver.close();
         } catch (Exception e) {
         }
     }

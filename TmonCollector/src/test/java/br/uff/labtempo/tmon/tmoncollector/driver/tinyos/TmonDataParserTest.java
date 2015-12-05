@@ -69,8 +69,10 @@ public class TmonDataParserTest {
         sensor = parser.parse("45678|2015-11-11 15:47:37.136511|12|25.716006|75|3.177922|0|10|iris");
         assertNotNull(sensor);
 
+
         assertEquals("45678", sensor.getId());
         assertEquals(1447256993511L, sensor.getCaptureTimestampInMillis());
+
 
         double temperature = 0;
         double voltage = 0;

@@ -24,5 +24,7 @@ import java.io.InputStream;
  */
 public interface Printer {
 
-    void setInputStream(InputStream is) throws IOException;
+    void setInputStream(InputStream is) throws Exception;
+
+    void setErrorStream(InputStream is) throws Exception;
 }
