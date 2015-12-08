@@ -23,15 +23,15 @@ import java.io.InputStream;
  */
 public class ConsoleCommand implements Command {
 
-    private final String command;
+    private final String[] command;
     private Printer printer;
     private Process process;
 
-    public ConsoleCommand(String command) {
+    public ConsoleCommand(String[] command) {
         this.command = command;
     }
 
-    public ConsoleCommand(String command, Printer printer) {
+    public ConsoleCommand(String[] command, Printer printer) {
         this.command = command;
         this.printer = printer;
     }

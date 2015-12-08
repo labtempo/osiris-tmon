@@ -69,28 +69,6 @@ public class App {
         boot.start();
     }
 
-    /**
-     * Eventos
-     *
-     * created * nova rede * novo sensor na rede * rede reativada(retornando do
-     * estado inativo) * sensor reativado(retornando do estado de inativo)
-     *
-     * modified * rede atualizada(metadados) * sensor atualizado(datos +
-     * metadados) * sensor bateria baixa(extra - regra de negócio do sensornet)
-     *
-     * deleted * sensor inativo(estrapolou o intervalo de captura) * rede
-     * inativa(sem nenhum sensor ativo)
-     *
-     */
-    /**
-     * Estados dos sensores
-     *
-     * * novo * atualizado * inativo * reativado
-     *
-     * novo -> atualizado -> inativo -> reativado -> atualizado novo -> inativo
-     * -> reativado -> atualizado
-     *
-     */
     private static void shutdownHook() {
         System.out.println("Control + C to terminate");
         final Thread thread = Thread.currentThread();
@@ -129,6 +107,9 @@ public class App {
                 properties.setProperty("rabbitmq.user.pass", "admin");
                 properties.setProperty("tmon.collector.name", "base");
                 properties.setProperty("tmon.capture.interval.seconds", "61");
+                properties.setProperty("tmon.smartsystemmonitor.folder", "/home/se/workspace/Thermal_Management/SmartSystemMonitor/");
+                properties.setProperty("python.path", "PYTHONPATH=/opt/tinyos-2.1.2/support/sdk/python:/home/se/workspace/Thermal_Management/SharedLibs/trunk/src:$PYTHONPATH");
+                properties.setProperty("python.command", "python -u");
 
                 FileOutputStream fileOut = new FileOutputStream(configFile);
 

@@ -44,9 +44,13 @@ public class Bootstrap implements AutoCloseable {
         String pass = properties.getProperty("rabbitmq.user.pass");
         String collectorName = properties.getProperty("tmon.collector.name");
         int captureInterval = Integer.parseInt(properties.getProperty("tmon.capture.interval.minutes"));
+        String smartSystemFolder = properties.getProperty("tmon.smartsystemmonitor.folder");
+        String pythonPath = properties.getProperty("python.path");
+        String pythonCommand = properties.getProperty("python.command");
         //TMON Collector
 
         try {
+            driver = new TinyOsDriver(smartSystemFolder, pythonPath, pythonCommand, params);
             driver = new VirtualDriver();
             client = new OmcpClientBuilder().host(ip).user(user, pass).source(collectorName).build();
             DataListener<SensorCoTo> listener = new MainController(client, collectorName, "tmon", captureInterval);
@@ -72,7 +76,7 @@ public class Bootstrap implements AutoCloseable {
             client.close();
         } catch (Exception e) {
         }
-        
+
         try {
             driver.close();
         } catch (Exception e) {
