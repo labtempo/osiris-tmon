@@ -113,7 +113,7 @@ public class App {
                 properties.setProperty("postgres.server.port", "5432");
                 properties.setProperty("postgres.user.name", "postgres");
                 properties.setProperty("postgres.user.pass", "postgres");
-                properties.setProperty("postgres.server.db", "TMON");
+                properties.setProperty("postgres.server.db", "SmartSystemMonitor");
 
                 FileOutputStream fileOut = new FileOutputStream(configFile);
 

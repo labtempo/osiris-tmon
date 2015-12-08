@@ -43,6 +43,8 @@ public interface VsnManager {
     FunctionVsnTo[] omcpGetFunctions();
     
     LinkVsnTo[] omcpGetLinks();
+    
+    boolean omcpHasLink(String network, String collector, String sensor);
 
     boolean omcpUpdateBlending(BlendingVsnTo blending);
     

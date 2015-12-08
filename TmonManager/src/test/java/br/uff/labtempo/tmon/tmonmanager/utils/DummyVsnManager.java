@@ -239,4 +239,24 @@ public class DummyVsnManager implements VsnManager {
             b.addRequestParam(bond.getFieldId(), bond.getParamName());
         }
     }
+
+    @Override
+    public boolean omcpHasLink(String network, String collector, String sensor) {
+        List<LinkVsnTo> links = getAll(LinkVsnTo.class);
+
+        for (LinkVsnTo link : links) {
+            if (!link.getSensorId().equals(sensor)) {
+                return false;
+            }
+            if (!link.getCollectorId().equals(collector)) {
+                return false;
+            }
+            if (!link.getNetworkId().equals(network)) {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

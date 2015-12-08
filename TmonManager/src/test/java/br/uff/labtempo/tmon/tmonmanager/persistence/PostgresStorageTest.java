@@ -46,7 +46,7 @@ public class PostgresStorageTest {
 
     @Ignore
     @Test
-    public void testSomeMethod() {
+    public void testPersistence_temp_ShouldPass() {
         Storage storage = new PostgresStorage(getConnection());
 
         SensorSnTo sensor = getSensor();

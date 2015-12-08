@@ -49,7 +49,7 @@ public class Bootstrap implements AutoCloseable {
         try {
             driver = new VirtualDriver();
             client = new OmcpClientBuilder().host(ip).user(user, pass).source(collectorName).build();
-            DataListener<SensorCoTo> listener = new MainController(client, collectorName, collectorName, captureInterval);
+            DataListener<SensorCoTo> listener = new MainController(client, collectorName, "tmon", captureInterval);
             driver.setOnDataCaptureListener(listener);
         } catch (Exception ex) {
             close();

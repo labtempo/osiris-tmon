@@ -16,6 +16,7 @@
 package br.uff.labtempo.tmon.tmonmanager.persistence;
 
 import br.uff.labtempo.osiris.to.sensornet.SensorSnTo;
+import br.uff.labtempo.tmon.tmonmanager.model.Mote;
 
 /**
  *
@@ -33,6 +34,10 @@ public interface Storage {
     void storeAverageTemperature(double temperature, long timestamp);
 
     void storeMote(SensorSnTo sensor);
+    
+    boolean hasMote(int id);
+    
+    Mote getMote(int id);
 
     void storeAlert(String alertType, long timestamp, String msg, String exchangeChannel);
     

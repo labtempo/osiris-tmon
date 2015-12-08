@@ -127,8 +127,6 @@ public class VsnManagerImpl implements VsnManager {
             throw new RuntimeException(r.getStatusCode().toString());
         }
     }
-    
-    
 
     @Override
     public boolean omcpUpdateBlending(BlendingVsnTo blending) {
@@ -149,17 +147,31 @@ public class VsnManagerImpl implements VsnManager {
             throw new RuntimeException(r.getStatusCode().toString() + ":" + r.getErrorMessage());
         }
 
-        InterfaceFnTo interfaceFnTo = r.getContent(InterfaceFnTo.class);        
+        InterfaceFnTo interfaceFnTo = r.getContent(InterfaceFnTo.class);
         FunctionVsnTo functionVsnTo = new FunctionVsnTo(interfaceFnTo);
-        
+
         functionResource = "omcp://virtualsensornet/function/";
         r = client.doPost(functionResource, functionVsnTo);
         if (r.getStatusCode() == StatusCode.CREATED) {
-             r = client.doGet(r.getLocation());
+            r = client.doGet(r.getLocation());
             functionVsnTo = r.getContent(FunctionVsnTo.class);
             return functionVsnTo;
         } else {
             throw new RuntimeException(r.getStatusCode().toString() + ":" + r.getErrorMessage());
+        }
+    }
+
+    @Override
+    public boolean omcpHasLink(String network, String collector, String sensor) {
+        Response r = client.doGet("omcp://virtualsensornet/link/?sensor="+sensor+"&collector="+collector+"&network="+network+"");
+        if (r.getStatusCode() == StatusCode.OK) {
+            LinkVsnTo[] links = r.getContent(LinkVsnTo[].class);
+            if(links.length > 0){
+                return true;
+            }
+            return false;
+        } else {
+            throw new RuntimeException(r.getStatusCode().toString());
         }
     }
 

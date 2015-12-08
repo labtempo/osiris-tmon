@@ -31,7 +31,7 @@ public class PgTimestampWithTimeZoneTest {
 
     @Ignore
     @Test
-    public void testSomeMethod() throws ParseException {
+    public void testDataFormat_temp_ShouldPass() throws ParseException {
         String time = PgTimestampWithTimeZone.convert(Calendar.getInstance());
         System.out.println(time);
     }

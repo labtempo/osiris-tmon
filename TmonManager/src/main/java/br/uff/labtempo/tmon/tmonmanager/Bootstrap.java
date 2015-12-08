@@ -21,6 +21,7 @@ import br.uff.labtempo.omcp.service.OmcpService;
 import br.uff.labtempo.omcp.service.rabbitmq.RabbitService;
 import br.uff.labtempo.osiris.omcp.EventController;
 import br.uff.labtempo.tmon.tmonmanager.controller.MainController;
+import br.uff.labtempo.tmon.tmonmanager.controller.util.CachedVsnManager;
 import br.uff.labtempo.tmon.tmonmanager.controller.util.VsnManager;
 import br.uff.labtempo.tmon.tmonmanager.controller.util.VsnManagerImpl;
 import br.uff.labtempo.tmon.tmonmanager.factory.ConnectionFactory;
@@ -37,7 +38,7 @@ public class Bootstrap implements AutoCloseable {
 
     private OmcpService omcpService;
     private final OmcpClient omcpClient;
-    private static final long AVERAGE_INTERVAL_IN_MILLIS = 1000;
+    private static final long AVERAGE_INTERVAL_IN_MILLIS = 6000;
 
     public Bootstrap(Properties properties) throws Exception {
         this(properties, false);
@@ -56,7 +57,7 @@ public class Bootstrap implements AutoCloseable {
 
             omcpClient = new OmcpClientBuilder().host(ip).user(user, pass).source(moduleName).build();
 
-            VsnManager manager = new VsnManagerImpl(omcpClient);
+            VsnManager manager = new CachedVsnManager(new VsnManagerImpl(omcpClient), 60);//60 seconds to expire cache
             Storage storage = new PostgresStorage(connection);
             EventController mainController = new MainController(manager, storage, AVERAGE_INTERVAL_IN_MILLIS);
 

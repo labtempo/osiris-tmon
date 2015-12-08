@@ -160,6 +160,7 @@ public class ToHandlerImplTest {
         BlendingVsnTo blending = toHandler.generateBlending(dataType, temperature);
 
         blending = toHandler.addVsensorToBlending(blending, virtualSensor, temperature, temperature, average);
+        blending = toHandler.addVsensorToBlending(blending, virtualSensor, temperature, temperature, average);
 
         assertEquals(1, blending.getRequestParams().size());
 

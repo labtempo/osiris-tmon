@@ -16,6 +16,7 @@
 package br.uff.labtempo.tmon.tmonmanager.utils;
 
 import br.uff.labtempo.osiris.to.sensornet.SensorSnTo;
+import br.uff.labtempo.tmon.tmonmanager.model.Mote;
 import br.uff.labtempo.tmon.tmonmanager.persistence.Storage;
 
 /**
@@ -23,6 +24,8 @@ import br.uff.labtempo.tmon.tmonmanager.persistence.Storage;
  * @author Felipe Santos <fralph at ic.uff.br>
  */
 public class DummyStorage implements Storage {
+
+    private boolean mote;
 
     @Override
     public void storeSample(SensorSnTo sensor) {
@@ -45,8 +48,22 @@ public class DummyStorage implements Storage {
     }
 
     @Override
-    public void updateMoteStatus(int id, boolean status ) {
+    public void updateMoteStatus(int id, boolean status) {
         System.out.println("updateMoteStatus");
     }
 
+    @Override
+    public boolean hasMote(int id) {
+        System.out.println("hasMote");
+        return true;
+    }
+
+    @Override
+    public Mote getMote(int id) {
+        if (mote) {
+            return new Mote(id, true, "", "", "");
+        }
+        mote = true;
+        return null;
+    }
 }

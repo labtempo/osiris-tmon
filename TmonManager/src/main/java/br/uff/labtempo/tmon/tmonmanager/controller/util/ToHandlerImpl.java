@@ -28,7 +28,9 @@ import br.uff.labtempo.osiris.to.virtualsensornet.LinkVsnTo;
 import br.uff.labtempo.osiris.to.virtualsensornet.ValueVsnTo;
 import br.uff.labtempo.osiris.to.virtualsensornet.VirtualSensorVsnTo;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ToHandlerImpl implements ToHandler {
 
@@ -73,12 +75,21 @@ public class ToHandlerImpl implements ToHandler {
 
     @Override
     public BlendingVsnTo addVsensorToBlending(BlendingVsnTo blending, VirtualSensorVsnTo virtualSensor, String fieldName, String requestParamName, String responseParamName) {
+        Set<Long> requestIds = new HashSet<>();
+        List<BlendingBondVsnTo> bondVsnTosRequest =  blending.getRequestParams();
+        
+        for (BlendingBondVsnTo bbvt : bondVsnTosRequest) {
+            requestIds.add(bbvt.getFieldId());
+        }
+        
         //add vsensor
         List<ValueVsnTo> values = virtualSensor.getValuesTo();
         for (ValueVsnTo value : values) {
-            if (value.getName().equals(fieldName)) {
-                blending.addRequestParam(value.getId(), requestParamName);
-                break;
+            String name = value.getName();
+            long id = value.getId();
+            if (name.equals(fieldName) && !requestIds.contains(id)) {
+                blending.addRequestParam(id, requestParamName);
+                break;//HAS ONLY ONE PARAM CALLED temperature
             }
         }
 
@@ -98,27 +109,16 @@ public class ToHandlerImpl implements ToHandler {
         for (ValueVsnTo valuesTo : virtualSensor.getValuesTo()) {
             if (valuesTo.getName().equals(fieldName)) {
                 fieldId = valuesTo.getId();
-                break;
+                break;//HAS ONLY ONE PARAM CALLED temperature
             }
         }
 
         if (fieldId == -1) {
             throw new RuntimeException("Not have field in blending!");
         }
-
-        List<BlendingBondVsnTo> bondsToRemove = new ArrayList<>();
-        List<BlendingBondVsnTo> blendingBonds = blending.getRequestParams();
-
-        for (BlendingBondVsnTo blendingBond : blendingBonds) {
-            if (blendingBond.getFieldId() == fieldId) {
-                bondsToRemove.add(blendingBond);
-            }
-        }
-
-        for (BlendingBondVsnTo bond : bondsToRemove) {
-            blending.removeRequestParam(bond.getFieldId());
-        }
-
+        
+        blending.removeRequestParam(fieldId);
+        
         return blending;
     }
 

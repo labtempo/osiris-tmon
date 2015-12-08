@@ -17,11 +17,12 @@ package br.uff.labtempo.tmon.tmonmanager.persistence;
 
 import br.uff.labtempo.osiris.to.common.data.InfoTo;
 import br.uff.labtempo.osiris.to.common.data.ValueTo;
-import br.uff.labtempo.osiris.to.common.definitions.State;
 import br.uff.labtempo.osiris.to.sensornet.SensorSnTo;
 import br.uff.labtempo.tmon.tmonmanager.Config;
+import br.uff.labtempo.tmon.tmonmanager.model.Mote;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -142,7 +143,6 @@ public class PostgresStorage implements Storage {
         }
 
         String sql = "INSERT INTO \"" + Storage.MOTE_TABLE + "\"( id, status, \"moteModel\") VALUES (?, ?, ?)";
-        System.out.println(sql);
         try {
             PreparedStatement stmt = getStatement(sql);
             stmt.setInt(1, id);
@@ -187,11 +187,10 @@ public class PostgresStorage implements Storage {
          "moteLocalization" character varying(6),
          "localizationDescription" character varying(100)
          */
-        
+
         String sql = "UPDATE \"" + Storage.MOTE_TABLE + "\" SET status=? WHERE id=?";
-        System.out.println(sql);
         try {
-            PreparedStatement stmt = getStatement(sql);           
+            PreparedStatement stmt = getStatement(sql);
             stmt.setBoolean(1, status);
             stmt.setInt(2, id);
             stmt.execute();
@@ -200,6 +199,46 @@ public class PostgresStorage implements Storage {
             throw new RuntimeException(ex);
         }
     }
+
+    @Override
+    public boolean hasMote(int id) {
+        String sql = "SELECT COUNT(*) AS total FROM \"" + Storage.MOTE_TABLE + "\" WHERE id=?";
+        try {
+            PreparedStatement stmt = getStatement(sql);
+            stmt.setInt(1, id);
+            ResultSet r = stmt.executeQuery();
+            while (r.next()) {
+                long count = r.getLong("total");
+                if (count > 0) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (SQLException ex) {
+            Logger.getLogger(PostgresStorage.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public Mote getMote(int id) {
+        String sql = "SELECT id, status, \"moteModel\", \"moteLocalization\", \"localizationDescription\" FROM \"" + Storage.MOTE_TABLE + "\" WHERE id=?";
+        try {            
+            PreparedStatement stmt = getStatement(sql);
+            stmt.setInt(1, id);
+            ResultSet r = stmt.executeQuery();
+            while (r.next()) {                
+                Mote mote  = new Mote(r.getInt("id"), r.getBoolean("status"), r.getString("moteModel"), r.getString("moteLocalization"), r.getString("localizationDescription"));
+                return mote;
+            }
+            return null;
+        } catch (SQLException ex) {
+            Logger.getLogger(PostgresStorage.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
+        }
+    }
+    
+    
 
     private java.sql.Date getSqlDate(long timestamp) {
         return new java.sql.Date(timestamp);

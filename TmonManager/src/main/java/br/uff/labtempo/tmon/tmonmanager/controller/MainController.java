@@ -38,9 +38,14 @@ import br.uff.labtempo.tmon.tmonmanager.Config;
 import br.uff.labtempo.tmon.tmonmanager.controller.util.ToHandler;
 import br.uff.labtempo.tmon.tmonmanager.controller.util.ToHandlerImpl;
 import br.uff.labtempo.tmon.tmonmanager.controller.util.VsnManager;
+import br.uff.labtempo.tmon.tmonmanager.model.Mote;
 import br.uff.labtempo.tmon.tmonmanager.persistence.Storage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -51,6 +56,7 @@ public class MainController extends EventController {
     private VsnManager remote;
     private long averageIntervalInMillis;
     private final String AVERAGE_FUNCTION_MODULE_ADDRESS = Config.AVERAGE_FUNCTION_MODULE_ADDRESS;
+    private final String SENSOR_FIELD_NAME = Config.SENSOR_VALUE_TEMPERATURE;
     private final String BLENDING_FIELD_NAME = Config.BLENDING_FIELD_NAME;
     private final String FUNCTION_REQUEST_PARAM = Config.FUNCTION_REQUEST_PARAM;
     private final String FUNCTION_RESPONSE_PARAM = Config.FUNCTION_RESPONSE_PARAM;
@@ -77,12 +83,10 @@ public class MainController extends EventController {
     @Override
     public void process(Request request) throws MethodNotAllowedException, NotFoundException, InternalServerErrorException, NotImplementedException, BadRequestException {
         try {
-            if (request.getModule().contains(Path.NAMING_MODULE_VIRTUALSENSORNET.toString())) {
+            if (request.getResource().contains(Path.NAMING_MODULE_VIRTUALSENSORNET.toString())) {
                 VirtualSensorVsnTo virtualSensor = request.getContent(VirtualSensorVsnTo.class);
-                checkVirtualSensor(virtualSensor);
-            }
-
-            if (request.getModule().contains(Path.NAMING_MODULE_SENSORNET.toString())) {
+                checkVirtualSensor(virtualSensor);                
+            } else if (request.getResource().contains(Path.NAMING_MODULE_SENSORNET.toString())) {
                 final String UNIQUE_SENSOR = Path.SEPARATOR.toString() + Path.NAMING_MODULE_SENSORNET + Path.RESOURCE_SENSORNET_SENSOR_BY_ID;
                 if (match(request.getResource(), UNIQUE_SENSOR)) {
                     SensorSnTo sensor = request.getContent(SensorSnTo.class);
@@ -94,11 +98,11 @@ public class MainController extends EventController {
                     NetworkSnTo network = request.getContent(NetworkSnTo.class);
                     checkNetwork(network);
                 }
-
             }
         } catch (AbstractRequestException e) {
             throw e;
         } catch (Exception e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, e);
             System.out.println(e.getMessage());
         }
     }
@@ -109,6 +113,8 @@ public class MainController extends EventController {
             case LINK:
                 switch (virtualSensor.getState()) {
                     case NEW:
+                    case REACTIVATED:
+                    case UPDATED:
                         addLinkToBlending(virtualSensor);
                         break;
                     case INACTIVE:
@@ -117,7 +123,13 @@ public class MainController extends EventController {
                 }
                 break;
             case BLENDING:
-                persistTmonAverageTable(virtualSensor);
+                switch (virtualSensor.getState()) {
+                    case NEW:
+                    case REACTIVATED:
+                    case UPDATED:
+                        persistTmonAverageTable(virtualSensor);
+                        break;
+                }
                 break;
         }
     }
@@ -125,6 +137,11 @@ public class MainController extends EventController {
     //checkSensor()
     public void checkSensor(SensorSnTo sensor) {
         switch (sensor.getState()) {
+            case UPDATED:
+            case REACTIVATED:
+                if (existsInVirtualSensorNet(sensor)) {
+                    break;
+                }
             case NEW:
                 createLink(sensor);
                 break;
@@ -146,12 +163,17 @@ public class MainController extends EventController {
         int id = Integer.parseInt(sensor.getId());
         switch (state) {
             case NEW:
-                //novo sensor na rede
-                storage.storeMote(sensor);
-                storage.storeAlert(ALERT_WARNING, sensor.getCaptureTimestampInMillis(), "Mote ID: " + id + "  joined, insert its location", EXCHANGE_MOTE_STATUS);
             case REACTIVATED:
             case UPDATED:
-                if (state == State.REACTIVATED) {
+                //insert new mote - begin
+                Mote mote = storage.getMote(id);
+                if (mote == null) {
+                    storage.storeMote(sensor);
+                    storage.storeAlert(ALERT_WARNING, sensor.getCaptureTimestampInMillis(), "Mote ID: " + id + "  joined, insert its location", EXCHANGE_MOTE_STATUS);
+                    mote = storage.getMote(id);
+                }
+                //insert new mote - end
+                if (!mote.getStatus() || state == State.REACTIVATED) {
                     //sensor voltou a rede
                     storage.updateMoteStatus(id, true);
                     storage.storeAlert(ALERT_WARNING, sensor.getCaptureTimestampInMillis(), "Mote ID: " + id + " back to the network", EXCHANGE_MOTE_STATUS);
@@ -244,10 +266,11 @@ public class MainController extends EventController {
             blending = setBlendingFunction(blending);
         }
 
-        blending = creator.addVsensorToBlending(blending, virtualSensor, BLENDING_FIELD_NAME, FUNCTION_REQUEST_PARAM, FUNCTION_RESPONSE_PARAM);
+        blending = creator.addVsensorToBlending(blending, virtualSensor, SENSOR_FIELD_NAME, FUNCTION_REQUEST_PARAM, FUNCTION_RESPONSE_PARAM);
         remote.omcpUpdateBlending(blending);
     }
 
+    //TODO:bug - acertar parametros do blending
     private void removeLinkFromBlending(VirtualSensorVsnTo virtualSensor) {
         BlendingVsnTo[] blendings = remote.omcpGetBlendings();
         BlendingVsnTo blending;
@@ -258,7 +281,7 @@ public class MainController extends EventController {
         }
         blending = blendings[0];
 
-        blending = creator.removeVsensorFromBlending(blending, virtualSensor, BLENDING_FIELD_NAME);
+        blending = creator.removeVsensorFromBlending(blending, virtualSensor, SENSOR_FIELD_NAME);
 
         //remove function if not have request params
         if (blending.getRequestParams().isEmpty()) {
@@ -301,5 +324,15 @@ public class MainController extends EventController {
         blending = creator.addFunctionToBlending(blending, function, averageIntervalInMillis);
 
         return blending;
+    }
+
+    private boolean existsInVirtualSensorNet(SensorSnTo sensor) {
+        String sensorId = sensor.getId();
+        String collectorId = sensor.getCollectorId();
+        String networkId = sensor.getNetworkId();
+        if (remote.omcpHasLink(networkId, collectorId, sensorId)) {
+            return true;
+        }
+        return false;
     }
 }
