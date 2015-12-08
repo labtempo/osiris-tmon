@@ -8,6 +8,9 @@ from SharedLibs.tools import raw_to_celcius, raw_to_volts_iris, raw_to_volts_mic
 from Shared import *
 import pika  # component to access Event Manager
 
+sys.path.insert(0,'/opt/tinyos-2.1.2/support/sdk/python')
+sys.path.insert(1,'/home/se/workspace/Thermal_Management/SharedLibs/trunk/src')
+
 # logging levels
 CONSOLE_LOG_LEVEL = logging.DEBUG
 FILE_LOG_LEVEL = logging.WARNING
@@ -180,7 +183,7 @@ def create_logger(filename):
     return logger
 
 
-def save_reading(timestamp, msg, file):
+def save_reading(timestamp, msg):#, file):
     global logger 
     global mote_type
     delay = 0
@@ -200,8 +203,8 @@ def save_reading(timestamp, msg, file):
     else:
         readingTemperature = raw_to_celcius(msg.readingTemperature)
     #logger.info("Mote %d:    Temperature: %f    Light: %d    Voltage: %f    Parent: %d    Metric: %d    Delay: %d" % (msg.source, readingTemperature, msg.readingLight, voltage, msg.parent, msg.metric, msg.delay))
-    file.write("%f %d %d %f %d %f\n" % (timestamp-delay, msg.source, msg.seqno, readingTemperature, msg.readingLight, voltage))
-    file.flush()
+    #file.write("%f %d %d %f %d %f\n" % (timestamp-delay, msg.source, msg.seqno, readingTemperature, msg.readingLight, voltage))
+    #file.flush()
             
 def publish_reading(msg):
     global mote_type
@@ -237,7 +240,7 @@ def new_multihopsensing_packet(data, mote_type):
             msg = MultihopSensingMsg(mote_type, data)  # convert a packet
         except:
             global logger
-            logger.exception("Unable to convert packet. Is this the right format?")
+            #logger.exception("Unable to convert packet. Is this the right format?")
     return msg
 
 def main(args):
@@ -263,8 +266,8 @@ def main(args):
         motes_to_ignore = map(int, args[4].split(','))
     
     exp_start = datetime.datetime.now().strftime("%d_%m_%y_%Hh%Mm%Ss")
-    file_samples = open("Output/samples_%s.agg" % exp_start, "w")
-    logger = create_logger("Output/Log/log_%s.txt" % (exp_start))
+    #file_samples = open("Output/samples_%s.agg" % exp_start, "w")
+    #logger = create_logger("Output/Log/log_%s.txt" % (exp_start))
     
     '''
     Contains a list of every mote. 
@@ -283,7 +286,7 @@ def main(args):
                 samples = Samples(ctp.data)
                 if samples.source not in motes_to_ignore:
                     if samples.readingTemperature != 0:
-                        save_reading(now, samples, file_samples)
+                        save_reading(now, samples)#, file_samples)
                     # print_ctp_header_info(ctp)                  
                     '''
                     Detect new motes as they appear on the network
@@ -304,11 +307,12 @@ def main(args):
         #logger.warning("Aborting...")
     except SystemExit:
         pass  # nothing to say about system exit
-    except:
-        logger.exception("An unhandled exception occurred.")
+    #except:
+        #logger.exception("An unhandled exception occurred.")
     finally:
-        file_samples.close()
-        logger.warning("Done...")
+	print 'closing'
+        #file_samples.close()
+        #logger.warning("Done...")
 
 
 if __name__ == "__main__":

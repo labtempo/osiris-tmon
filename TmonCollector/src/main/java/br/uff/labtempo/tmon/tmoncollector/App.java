@@ -128,7 +128,7 @@ public class App {
                 properties.setProperty("rabbitmq.user.name", "admin");
                 properties.setProperty("rabbitmq.user.pass", "admin");
                 properties.setProperty("tmon.collector.name", "base");
-                properties.setProperty("tmon.capture.interval.minutes", "6");
+                properties.setProperty("tmon.capture.interval.seconds", "61");
 
                 FileOutputStream fileOut = new FileOutputStream(configFile);
 
