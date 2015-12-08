@@ -71,7 +71,7 @@ public class TmonDataParserTest {
 
 
         assertEquals("45678", sensor.getId());
-        assertEquals(1447256993511L, sensor.getCaptureTimestampInMillis());
+        assertEquals(1447264193511L, sensor.getCaptureTimestampInMillis());
 
 
         double temperature = 0;
