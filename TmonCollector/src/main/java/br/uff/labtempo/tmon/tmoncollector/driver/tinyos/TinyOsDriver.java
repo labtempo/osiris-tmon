@@ -69,7 +69,7 @@ public class TinyOsDriver implements Driver<SensorCoTo>, Printer {
 
     @Override
     public void start() throws Exception {
-        String[] cmd = {"/bin/sh", "-c", pythonPath, pythonCommand, pythonPrgramFile, params};
+        String[] cmd = {"/bin/sh", "-c", pythonPath + " " + pythonCommand + " " + pythonPrgramFile + " " + params};
         command = new ConsoleCommand(cmd);
         command.setPrinter(this);
         command.execute();
