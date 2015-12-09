@@ -22,7 +22,6 @@ import br.uff.labtempo.tmon.tmoncollector.controller.MainController;
 import br.uff.labtempo.tmon.tmoncollector.driver.tinyos.TinyOsDriver;
 import br.uff.labtempo.tmon.tmoncollector.driver.DataListener;
 import br.uff.labtempo.tmon.tmoncollector.driver.Driver;
-import br.uff.labtempo.tmon.tmoncollector.driver.virtual.VirtualDriver;
 import java.util.Properties;
 
 /**

@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class VirtualDriver implements Driver<SensorCoTo> {
 
-    private int wave = 0;
     private long sendCount = 1;
     private DataListener<SensorCoTo> listener;
     private TmonDataParser parser;
