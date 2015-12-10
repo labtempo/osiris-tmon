@@ -85,7 +85,7 @@ public class MainController extends EventController {
         try {
             if (request.getResource().contains(Path.NAMING_MODULE_VIRTUALSENSORNET.toString())) {
                 VirtualSensorVsnTo virtualSensor = request.getContent(VirtualSensorVsnTo.class);
-                checkVirtualSensor(virtualSensor);                
+                checkVirtualSensor(virtualSensor);
             } else if (request.getResource().contains(Path.NAMING_MODULE_SENSORNET.toString())) {
                 final String UNIQUE_SENSOR = Path.SEPARATOR.toString() + Path.NAMING_MODULE_SENSORNET + Path.RESOURCE_SENSORNET_SENSOR_BY_ID;
                 if (match(request.getResource(), UNIQUE_SENSOR)) {
@@ -136,15 +136,18 @@ public class MainController extends EventController {
 
     //checkSensor()
     public void checkSensor(SensorSnTo sensor) {
-        switch (sensor.getState()) {
-            case UPDATED:
-            case REACTIVATED:
-                if (existsInVirtualSensorNet(sensor)) {
+        //add to link only if it has a temperature value
+        if (hasTemperatureValue(sensor)) {
+            switch (sensor.getState()) {
+                case UPDATED:
+                case REACTIVATED:
+                    if (existsInVirtualSensorNet(sensor)) {
+                        break;
+                    }
+                case NEW:
+                    createLink(sensor);
                     break;
-                }
-            case NEW:
-                createLink(sensor);
-                break;
+            }
         }
         persistTmonSensorTable(sensor);
     }
@@ -332,6 +335,15 @@ public class MainController extends EventController {
         String networkId = sensor.getNetworkId();
         if (remote.omcpHasLink(networkId, collectorId, sensorId)) {
             return true;
+        }
+        return false;
+    }
+
+    private boolean hasTemperatureValue(SensorSnTo sensor) {
+        for (ValueTo valuesTo : sensor.getValuesTo()) {
+            if (SENSOR_FIELD_NAME.equals(valuesTo.getName())) {
+                return true;
+            }
         }
         return false;
     }
